@@ -94,7 +94,10 @@ Packages used in this configuration. This will take a long time the first time.
 #+begin_src emacs-lisp
 
   (setq package-list
-	'(doom-themes))
+	'(doom-themes
+	  counsel
+	  company
+	  yasnippet))
 
   (dolist (package package-list)
     (straight-use-package package))
@@ -131,6 +134,37 @@ Use UTF-8 encoding as much as possible.
 
 * Interface
 
+** Buffer
+
+use ibuffer as default buffer editor
+
+#+begin_src emacs-lisp
+
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+
+#+end_src
+
+human readable size column
+
+#+begin_src emacs-lisp
+
+  (define-ibuffer-column size-h
+    (:name "Size")
+    (cond
+     ((> (buffer-size) 1000000) (format "%7.1fM" (/ (buffer-size) 1000000.0)))
+     ((> (buffer-size) 100000) (format "%7.0fk" (/ (buffer-size) 1000.0)))
+     ((> (buffer-size) 1000) (format "%7.1fk" (/ (buffer-size) 1000.0)))
+     (t (format "%8d" (buffer-size)))))
+
+  (setq ibuffer-formats
+	'((mark modified read-only " "
+		(name 18 18 :left :elide) " "
+		(size-h 9 -1 :right) " "
+		(mode 16 16 :left :elide) " "
+		filename-and-process)))
+
+#+end_src
+
 ** Dialogs
 
 Disable dialogs and popups.
@@ -163,13 +197,32 @@ Allows system and Emacs clipboard to communicate smoothly
 
 ** Colors
 
-
 Load the Tomorrow color theme
 
 #+begin_src emacs-lisp
 
   (require 'doom-themes)
   (load-theme 'doom-tomorrow-day t)
+
+#+end_src
+
+** Font
+
+Set the Iosevka Font
+
+#+begin_src emacs-lisp
+
+  (add-to-list 'default-frame-alist '(font . "Iosevka 14"))
+  
+#+end_src
+
+** Line Numbers
+
+Enable line numbers when in prog mode
+
+#+begin_src emacs-lisp
+
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 #+end_src
 
@@ -192,5 +245,45 @@ Enable Visual line mode for prog and text modes
 
   (add-hook 'text-mode-hook 'visual-line-mode)
   (add-hook 'prog-mode-hook 'visual-line-mode)
+
+#+end_src
+
+* Completion
+
+** Ivy
+
+Enable Ivy completion everywhere
+
+#+begin_src emacs-lisp
+
+  (ivy-mode 1)
+  
+#+end_src
+
+Map swiper search to key
+
+#+begin_src emacs-lisp
+
+  (global-set-key (kbd "C-s") 'swiper-isearch)
+
+#+end_src
+
+** Company
+
+Enable Company completion everywhere
+
+#+begin_src emacs-lisp
+
+  (add-hook 'after-init-hook 'global-company-mode)
+
+#+end_src
+
+* Snippets
+
+enable snippets everywhere
+
+#+begin_src emacs-lisp
+
+  (yas-global-mode t)
 
 #+end_src
