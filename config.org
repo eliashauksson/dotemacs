@@ -1,0 +1,196 @@
+#+title: My Emacs Configuration
+#+author: Elías Hauksson
+
+* Core
+
+** Header
+
+This will generate a header at the top of the tangled file to indicate it is generated and is not meant to be modified directly.
+
+#+begin_src emacs-lisp
+
+  ;; -*- lexical-binding: t -*-
+  ;; This file has been generated from config.org file. DO NOT EDIT.
+  ;; Sources are available from https://github.com/eliashauksson/dotemacs
+
+  ;; Copyright (C) 2022 Elías Hauksson
+
+  ;; This file is free software; you can redistribute it and/or modify
+  ;; it under the terms of the GNU General Public License as publishd by
+  ;; the Free Software Foundation; either version 3, or (at your option)
+  ;; any later version.
+
+  ;; This file is distributed in the hope it will be useful,
+  ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ;; GNU General Public License for more details.
+
+  ;; For a full copy of the GNU General Public License
+  ;; see <https://www.gnu.org/licenses/>.
+
+#+end_src
+
+** Early init
+
+This code is meant to go to the =early-init.el= file.
+
+#+begin_src emacs-lisp :tangle no
+
+  (setq
+   site-run-file nil
+   inhibit-default-init t
+   gc-cons-threshold most-positive-fixnum
+   package-enable-at-startup nil)
+
+  (add-hook 'after-init-hook
+	    #'(lambda () (setq gc-cons-threshold (* 8 1024 1024))))
+  
+#+end_src
+
+** Init
+
+This code is meant to go to the =init.el= file.
+
+#+begin_src emacs-lisp :tangle no
+
+  (require 'org)
+  (org-babel-load-file "~/.config/emacs/config.org")
+
+#+end_src
+
+** Package management
+
+Using [[https://github.com/radian-software/straight.el][straight.el]] for package management.
+
+Disable checking for faster startup.
+
+#+begin_src emacs-lisp
+
+  (setq straight-check-for-modifications nil)
+
+#+end_src
+
+ #+begin_src emacs-lisp
+
+   (defvar bootstrap-version)
+   (let ((bootstrap-file
+	  (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+	 (bootstrap-version 6))
+     (unless (file-exists-p bootstrap-file)
+       (with-current-buffer
+	   (url-retrieve-synchronously
+	    "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+	    'silent 'inhibit-cookies)
+	 (goto-char (point-max))
+	 (eval-print-last-sexp)))
+     (load bootstrap-file nil 'nomessage))
+
+#+end_src
+
+** Package installation
+
+Packages used in this configuration. This will take a long time the first time.
+
+#+begin_src emacs-lisp
+
+  (setq package-list
+	'(doom-themes))
+
+  (dolist (package package-list)
+    (straight-use-package package))
+
+#+end_src
+
+** Startup
+
+Emacs does a lot of things at startup and here, we disable pretty much everything
+
+#+begin_src emacs-lisp
+
+  (setq-default
+   inhibit-startup-screen t
+   inhibit-startup-message t
+   inhibit-startup-echo-area-message t
+   initial-scratch-message ""
+   initial-buffer-choice t)
+
+#+end_src
+
+** Encoding
+
+Use UTF-8 encoding as much as possible.
+
+#+begin_src emacs-lisp
+
+  (set-default-coding-systems 'utf-8)
+  (prefer-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+
+#+end_src
+
+* Interface
+
+** Dialogs
+
+Disable dialogs and popups.
+
+#+begin_src emacs-lisp
+
+  (setq-default show-help-function nil
+		use-file-dialog nil
+		use-dialog-box nil
+		pop-up-windows nil)
+
+  (tooltip-mode -1)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+
+#+end_src
+
+** Clipboard
+
+Allows system and Emacs clipboard to communicate smoothly
+
+#+begin_src emacs-lisp
+
+  (setq-default select-enable-clipboard t)
+
+#+end_src
+
+* Visual
+
+** Colors
+
+
+Load the Tomorrow color theme
+
+#+begin_src emacs-lisp
+
+  (require 'doom-themes)
+  (load-theme 'doom-tomorrow-day t)
+
+#+end_src
+
+* Editing 
+
+** Default mode
+
+Set text mode as default
+
+#+begin_src emacs-lisp
+
+  (setq-default initial-major-mode 'text-mode
+		default-major-mode 'text-mode)
+
+#+end_src
+
+Enable Visual line mode for prog and text modes
+
+#+begin_src emacs-lisp
+
+  (add-hook 'text-mode-hook 'visual-line-mode)
+  (add-hook 'prog-mode-hook 'visual-line-mode)
+
+#+end_src
