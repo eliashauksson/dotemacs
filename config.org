@@ -48,12 +48,20 @@ This code is meant to go to the =early-init.el= file.
 #+end_src
 
 ** Init
-
 This code is meant to go to the =init.el= file.
 
 #+begin_src emacs-lisp :tangle no
 
-  (require 'org)
+  (let ((emacs-dir "~/.config/emacs/")
+		(org-dir "src/org-mode"))
+	(when (not (file-directory-p (concat emacs-dir org-dir)))
+	  (make-directory org-dir emacs-dir)
+	  (shell-command (concat "git clone https://git.savannah.gnu.org/git/emacs/org-mode.git "
+							 emacs-dir org-dir))
+	  (shell-command (concat "cd " emacs-dir org-dir "; make autoloads"))))
+
+  (add-to-list 'load-path "~/.config/emacs/src/org-mode/lisp")
+
   (org-babel-load-file "~/.config/emacs/config.org")
 
 #+end_src
@@ -97,10 +105,11 @@ Packages used in this configuration. This will take a long time the first time.
 	'(doom-themes
 	  counsel
 	  company
-	  yasnippet))
+	  yasnippet
+	  org-roam))
 
   (dolist (package package-list)
-    (straight-use-package package))
+	(straight-use-package package))
 
 #+end_src
 
@@ -129,6 +138,14 @@ Use UTF-8 encoding as much as possible.
   (prefer-coding-system 'utf-8)
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
+
+#+end_src
+
+** Tabs
+
+#+begin_src emacs-lisp
+
+  (setq-default tab-width 4)
 
 #+end_src
 
